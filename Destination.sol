@@ -27,7 +27,7 @@ contract Destination is AccessControl {
 
 	function createToken(address _underlying_token, string memory name, string memory symbol ) public onlyRole(CREATOR_ROLE) returns(address) {
     
-    require(wrapped_tokens[_underlying_token] == address(0), "Check as per TA guideline"); //still no idea what this does nor why we should do this
+    //require(wrapped_tokens[_underlying_token] == address(0), "Check as per TA guideline"); //still no idea what this does nor why we should do this
 
     BridgeToken newBridgeToken = new BridgeToken(_underlying_token, name, symbol, address(this)); // this address
     address newBridgeTokenAddress = address(newBridgeToken);
@@ -43,7 +43,7 @@ contract Destination is AccessControl {
 	}
         
 	function wrap(address _underlying_token, address _recipient, uint256 _amount ) public onlyRole(WARDEN_ROLE) {
-		require(underlying_tokens[_underlying_token] != address(0), "Underlying asset not registered");
+		require(wrapped_tokens[_underlying_token] != address(0), "Underlying asset not registered"); // changed to wrapped []
 
     BridgeToken wrappedToken = BridgeToken(wrapped_tokens[_underlying_token]); //changed: take it from wrapped token and not underlying_tokens
     wrappedToken.mint(_recipient, _amount);
@@ -54,7 +54,7 @@ contract Destination is AccessControl {
 
   function unwrap(address _wrapped_token, address _recipient, uint256 _amount) public {
     // Ensure the wrapped token address corresponds to a registered BridgeToken contract
-    require(underlying_tokens[_wrapped_token] != address(0), "Wrapped token not registered"); /// changed to underlying[]
+    require(underlying_tokens[_wrapped_token] != address(0), "Wrapped token not registered"); /// + changed to underlying[]
 
     // Create an instance of the BridgeToken to interact with
     BridgeToken wrappedToken = BridgeToken(_wrapped_token);
